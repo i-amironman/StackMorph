@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "StackMorph",
+  "version": "1.0",
+  "description": "An AI-powered converter to migrate your project's tech stack.",
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "host_permissions": [
+    "https://copy-of-stack-morph-backend-402409256703.us-west1.run.app/*"
+  ]
+}

@@ -1,0 +1,5 @@
+{
+  "name": "StackMorph - Frontend",
+  "description": "A Chrome Extension popup that allows uploading a .zip file of a website's source code, selecting a target tech stack (React, Vue, or Svelte), and initiating a conversion process via a backend API.",
+  "requestFramePermissions": []
+}
