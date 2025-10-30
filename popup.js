@@ -3,8 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const idleView = document.getElementById('idle-view');
     const loadingView = document.getElementById('loading-view');
     const successView = document.getElementById('success-view');
-    const API_URL = "https://copy-of-stack-morph-backend-402409256703.us-west1.run.app";
-
+const API_URL = "http://localhost:8080";
     // Idle View Elements
     const uploadForm = document.getElementById('upload-form');
     const dropZone = document.getElementById('drop-zone');
