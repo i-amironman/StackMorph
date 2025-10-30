@@ -141,7 +141,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 let errorMsg = `Conversion failed (status: ${xhr.status}). Please try again.`;
                  try {
                     const errorJson = JSON.parse(xhr.responseText);
-                    errorMsg = errorJson.message || errorMsg;
+                    // ---
+                    // MODIFICATION: Changed 'errorJson.message' to 'errorJson.error'
+                    // ---
+                    errorMsg = errorJson.error || errorMsg;
                 } catch (e) {
                     // Ignore parsing error, use default message
                 }
