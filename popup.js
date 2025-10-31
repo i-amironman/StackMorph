@@ -3,7 +3,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const idleView = document.getElementById('idle-view');
     const loadingView = document.getElementById('loading-view');
     const successView = document.getElementById('success-view');
-const API_URL = "http://localhost:8080";
+    const API_URL = "http://localhost:8080";
+
     // Idle View Elements
     const uploadForm = document.getElementById('upload-form');
     const dropZone = document.getElementById('drop-zone');
@@ -24,6 +25,7 @@ const API_URL = "http://localhost:8080";
     const resetBtn = document.getElementById('reset-btn');
 
     let currentFile = null;
+    let countdownInterval = null; // --- MODIFICATION: Added timer variable ---
 
     // --- Utility Functions ---
 
@@ -40,7 +42,12 @@ const API_URL = "http://localhost:8080";
         convertBtn.disabled = !(currentFile && techStackSelect.value);
     }
 
+    // --- MODIFICATION: Clear timer on reset ---
     function resetToIdle() {
+        if (countdownInterval) {
+            clearInterval(countdownInterval);
+            countdownInterval = null;
+        }
         currentFile = null;
         fileInput.value = '';
         techStackSelect.value = '';
@@ -106,8 +113,8 @@ const API_URL = "http://localhost:8080";
         if (convertBtn.disabled) return;
         
         showView(loadingView);
-        progressContainer.style.display = 'block';
-        loadingTitle.textContent = 'Uploading...';
+        progressContainer.style.display = 'block'; // Show progress bar for upload
+        loadingTitle.textContent = 'Uploading...'; // Set text to Uploading
         loadingText.textContent = currentFile.name;
 
         const formData = new FormData();
@@ -116,6 +123,7 @@ const API_URL = "http://localhost:8080";
         
         const xhr = new XMLHttpRequest();
 
+        // This event handles upload progress
         xhr.upload.addEventListener('progress', (event) => {
             if (event.lengthComputable) {
                 const percentComplete = Math.round((event.loaded / event.total) * 100);
@@ -124,25 +132,54 @@ const API_URL = "http://localhost:8080";
             }
         });
 
-        xhr.addEventListener('load', () => {
+        // ---
+        // MODIFICATION: This event now starts the 60s countdown
+        // ---
+        xhr.upload.addEventListener('load', () => {
             progressContainer.style.display = 'none';
-            loadingTitle.textContent = 'Morphing your stack...';
-            loadingText.textContent = 'Processing... this may take a few moments.';
+            loadingText.textContent = 'This may take a few moments.';
+
+            let seconds = 60;
+            loadingTitle.textContent = `Converting... ${seconds}s`;
+
+            // Clear any old interval
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+            }
+            
+            countdownInterval = setInterval(() => {
+                seconds--;
+                if (seconds > 0) {
+                    loadingTitle.textContent = `Converting... ${seconds}s`;
+                } else {
+                    // When timer hits 0, stop the interval and show the generic message
+                    clearInterval(countdownInterval);
+                    countdownInterval = null;
+                    loadingTitle.textContent = 'Converting...';
+                    loadingText.textContent = 'Finalizing conversion...';
+                }
+            }, 1000);
+        });
+
+        // This event fires when the server *responds*
+        xhr.addEventListener('load', () => {
+            // --- MODIFICATION: Stop the timer as soon as we get a response ---
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+            }
 
             if (xhr.status === 200) {
                 const blob = xhr.response;
                 const downloadUrl = URL.createObjectURL(blob);
 
                 downloadLink.href = downloadUrl;
-                downloadLink.download = `morphed-${currentFile.name}`;
+                downloadLink.download = `${techStackSelect.value}-${currentFile.name}`;
                 showView(successView);
             } else {
                 let errorMsg = `Conversion failed (status: ${xhr.status}). Please try again.`;
                  try {
                     const errorJson = JSON.parse(xhr.responseText);
-                    // ---
-                    // MODIFICATION: Changed 'errorJson.message' to 'errorJson.error'
-                    // ---
                     errorMsg = errorJson.error || errorMsg;
                 } catch (e) {
                     // Ignore parsing error, use default message
@@ -153,6 +190,11 @@ const API_URL = "http://localhost:8080";
         });
         
         xhr.addEventListener('error', () => {
+            // --- MODIFICATION: Stop the timer on error ---
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+            }
             showView(idleView);
             displayError('Upload failed. Check your network connection.');
         });
