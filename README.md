@@ -6,5 +6,9 @@
 ## How to Use it:
 
 1. Download or Clone the repo https://github.com/i-amironman/StackMorph.git
-2. Open the `chrome://extensions` and use my chrome extension by loading it in your chrome browser (or) open chrome --> three dots (from top right) -->  extensions --> manage extensions --> load unpacked --> select the folder --> add to your chrome extension pinbar --> test it (to test the extension, download zip from any of the zip files provided in this repo ).
+
+2. Open the `chrome://extensions` and use my chrome extension by loading it in your chrome browser 
+            (or) 
+   open chrome --> three dots (from top right) -->  extensions --> manage extensions --> load unpacked --> select the folder --> add to your chrome extension pinbar --> test it (to test the extension, download zip from any of the zip files provided in this repo ).
+
 3. Congratulations 🎉 You successfully used my Chrome Extension. ☺️
